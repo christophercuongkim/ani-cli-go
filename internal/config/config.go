@@ -11,55 +11,54 @@ import (
 
 type (
 	Config struct {
-		General   general
-		Downloads downloads
-		History   history
-		Anilist   anilist
-		Mal       mal
-		Syncplay  syncplay
-		Tui       tui
+		General   general   `toml:"general"`
+		Downloads downloads `toml:"downloads"`
+		History   history   `toml:"history"`
+		Anilist   anilist   `toml:"anilist"`
+		Mal       mal       `toml:"mal"`
+		Syncplay  syncplay  `toml:"syncplay"`
+		Tui       tui       `toml:"tui"`
 	}
 
 	general struct {
-		Player        string
-		Quality       string
-		Mode          string
-		Skip_intro    bool
-		Detach_player bool
+		Player       string `toml:"player"`
+		Quality      string `toml:"quality"`
+		Mode         string `toml:"mode"`
+		SkipIntro    bool   `toml:"skip_intro"`
+		DetachPlayer bool   `toml:"detach_player"`
 	}
 
 	downloads struct {
-		Directory            string
-		Concurrent_fragments int
+		Directory           string `toml:"directory"`
+		ConcurrentFragments int    `toml:"concurrent_fragments"`
 	}
 
 	history struct {
-		Db_path string
+		DbPath string `toml:"db_path"`
 	}
 
 	anilist struct {
-		Enabled bool
-		Token   string
+		Enabled bool   `toml:"enabled"`
+		Token   string `toml:"token"`
 	}
 
 	mal struct {
-		Enabled   bool
-		Client_id string
+		Enabled  bool   `toml:"enabled"`
+		ClientId string `toml:"client_id"`
 	}
 
 	syncplay struct {
-		Server   string
-		Room     string
-		Username string
+		Server   string `toml:"server"`
+		Room     string `toml:"room"`
+		Username string `toml:"username"`
 	}
 
 	tui struct {
-		Theme string
+		Theme string `toml:"theme"`
 	}
 )
 
 const (
-	defaultConfigLocation    = "$XDG_CONFIG_HOME/ani-cli-go/configuration.toml"
 	ownerFullOthersReadExec  = 0755
 	ownerReadWriteOthersRead = 0644
 )
@@ -75,6 +74,11 @@ func LoadConfig(filename string) (*Config, error) {
 
 		Should be able to expand env vars.
 	*/
+
+	if os.Getenv("XDG_CONFIG_HOME") == "" {
+		home, _ := os.UserHomeDir()
+		os.Setenv("XDG_CONFIG_HOME", filepath.Join(home, ".config"))
+	}
 	configFileLocation := os.ExpandEnv(filename)
 
 	/*
@@ -84,7 +88,8 @@ func LoadConfig(filename string) (*Config, error) {
 	folderPath := filepath.Dir(configFileLocation)
 	err := os.MkdirAll(folderPath, ownerFullOthersReadExec)
 	if err != nil {
-		log.Fatal().Err(err).Str("folderPath", folderPath).Msg("Unable to make directories")
+		log.Error().Err(err).Str("folderPath", folderPath).Msg("Unable to make directories")
+		return nil, err
 	}
 
 	/*
@@ -93,7 +98,8 @@ func LoadConfig(filename string) (*Config, error) {
 	if _, err := os.Stat(configFileLocation); os.IsNotExist(err) {
 		err := os.WriteFile(configFileLocation, exampleConfigFile, ownerReadWriteOthersRead)
 		if err != nil {
-			log.Fatal().Err(err).Str("location", configFileLocation).Msg("Failed to create config file")
+			log.Error().Err(err).Str("location", configFileLocation).Msg("Failed to create config file")
+			return nil, err
 		}
 		log.Info().Str("location", configFileLocation).Msg("Config file created")
 	}
@@ -101,6 +107,7 @@ func LoadConfig(filename string) (*Config, error) {
 	var config Config
 
 	if _, err := toml.DecodeFile(configFileLocation, &config); err != nil {
+		log.Error().Err(err).Msg("Failed to decode file.")
 		return nil, err
 	}
 

@@ -1,4 +1,4 @@
-# ani-go: Implementation Plan for Porting ani-cli to Go
+# ani-cli-go: Implementation Plan for Porting ani-cli to Go
 
 > A comprehensive implementation plan for building a Go port of [ani-cli](https://github.com/pystardust/ani-cli) with significant enhancements over the original bash script.
 
@@ -44,9 +44,9 @@ Set up the Go module, directory layout, CLI flag parsing, and TOML configuration
 
 ### Directory Structure
 ```
-ani-go/
+ani-cli-go/
 ├── cmd/
-│   └── ani-go/
+│   └── ani-cli-go/
 │       └── main.go             # Entrypoint, flag parsing
 ├── internal/
 │   ├── config/
@@ -85,7 +85,7 @@ ani-go/
 └── README.md
 ```
 
-### Config File (`~/.config/ani-go/config.toml`)
+### Config File (`~/.config/ani-cli-go/config.toml`)
 ```toml
 [general]
 player = "libmpv"           # "libmpv" | "mpv" | "vlc" | "iina"
@@ -99,7 +99,7 @@ directory = "~/Videos/Anime"
 concurrent_fragments = 16
 
 [history]
-db_path = "~/.local/share/ani-go/history.db"
+db_path = "~/.local/share/ani-cli-go/history.db"
 
 [anilist]
 enabled = false
@@ -127,7 +127,7 @@ theme = "default"           # "default" | "catppuccin" | "dracula"
 
 ### Key Implementation Notes
 - CLI flags override TOML config values (cobra + viper pattern, or manual merge)
-- XDG base directory compliance: config in `$XDG_CONFIG_HOME/ani-go/`, data in `$XDG_DATA_HOME/ani-go/`, state in `$XDG_STATE_HOME/ani-go/`
+- XDG base directory compliance: config in `$XDG_CONFIG_HOME/ani-cli-go/`, data in `$XDG_DATA_HOME/ani-cli-go/`, state in `$XDG_STATE_HOME/ani-cli-go/`
 - Build tags: `libmpv` and `nolibmpv` for toggling cgo player backend
 
 ---
@@ -526,7 +526,7 @@ Provide cross-platform distribution with a first-class NixOS flake as a packagin
 ### NixOS Flake (`flake.nix`)
 ```nix
 {
-  description = "ani-go - A Go port of ani-cli";
+  description = "ani-cli-go - A Go port of ani-cli";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -539,7 +539,7 @@ Provide cross-platform distribution with a first-class NixOS flake as a packagin
         pkgs = nixpkgs.legacyPackages.${system};
       in {
         packages.default = pkgs.buildGoModule {
-          pname = "ani-go";
+          pname = "ani-cli-go";
           version = "0.1.0";
           src = ./.;
           vendorHash = ""; # Fill after first build
@@ -615,7 +615,7 @@ Provide cross-platform distribution with a first-class NixOS flake as a packagin
 
 ## Improvements Over Original ani-cli
 
-| Feature | ani-cli (bash) | ani-go |
+| Feature | ani-cli (bash) | ani-cli-go |
 |---------|---------------|--------|
 | Dependencies | fzf, curl, sed, grep, aria2, yt-dlp | Single binary |
 | UI | fzf / rofi / dmenu | Native Bubbletea TUI |
@@ -638,7 +638,7 @@ Provide cross-platform distribution with a first-class NixOS flake as a packagin
 Search, browse, play, and track watch history. This is the minimum viable replacement for ani-cli.
 
 ### Feature Parity (Phases 6-9) — Full ani-cli Coverage
-Downloads, tracker sync, intro skip, syncplay. At this point, ani-go matches or exceeds everything ani-cli can do.
+Downloads, tracker sync, intro skip, syncplay. At this point, ani-cli-go matches or exceeds everything ani-cli can do.
 
 ### Polish (Phases 10-12) — Production Ready
 Full TUI, self-update, cross-platform packaging. Ready for public release.

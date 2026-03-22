@@ -19,8 +19,11 @@ var rootCmd = &cobra.Command{
 	Use:   "ani-cli-go",
 	Short: "Go implementation of ani-cli.",
 	Long:  "TODO",
-	Run: func(cmd *cobra.Command, args []string) {
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		initConfig()
+	},
+	Run: func(cmd *cobra.Command, args []string) {
+		log.Info().Msg("not yet implemented.")
 	},
 }
 
