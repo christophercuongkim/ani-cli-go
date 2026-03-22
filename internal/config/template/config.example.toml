@@ -1,0 +1,29 @@
+[general]
+player = "libmpv"           # "libmpv" | "mpv" | "vlc" | "iina"
+quality = "best"            # "best" | "worst" | "1080" | "720" | "480" | "360"
+mode = "sub"                # "sub" | "dub"
+skip_intro = false
+detach_player = false
+
+[downloads]
+directory = "~/Videos/Anime"
+concurrent_fragments = 16
+
+[history]
+db_path = "~/.local/share/ani-go/history.db"
+
+[anilist]
+enabled = false
+token = ""
+
+[mal]
+enabled = false
+client_id = ""
+
+[syncplay]
+server = ""
+room = ""
+username = ""
+
+[tui]
+theme = "default"           # "default" | "catppuccin" | "dracula"
