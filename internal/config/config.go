@@ -14,6 +14,7 @@ type (
 		General   general   `toml:"general"`
 		Downloads downloads `toml:"downloads"`
 		History   history   `toml:"history"`
+		Search    Search    `toml:"search"`
 		Anilist   anilist   `toml:"anilist"`
 		Mal       mal       `toml:"mal"`
 		Syncplay  syncplay  `toml:"syncplay"`
@@ -51,6 +52,13 @@ type (
 		Server   string `toml:"server"`
 		Room     string `toml:"room"`
 		Username string `toml:"username"`
+	}
+
+	Search struct {
+		AllowAdult    bool   `toml:"allow_adult"`
+		AllowUnknown  bool   `toml:"allow_unknown"`
+		Limit         int    `toml:"limit"`
+		CountryOrigin string `toml:"country_origin"`
 	}
 
 	tui struct {

@@ -12,6 +12,12 @@ concurrent_fragments = 16
 [history]
 db_path = "~/.local/share/ani-go/history.db"
 
+[search]
+allow_adult = false
+allow_unknown = false
+limit = 40
+country_origin = "ALL"  # "ALL" | "JP" | "CN" | "KR"
+
 [anilist]
 enabled = false
 token = ""
