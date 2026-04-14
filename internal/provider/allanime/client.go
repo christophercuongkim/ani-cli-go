@@ -86,8 +86,38 @@ func (s *AllAnimeService) SearchAnime(ctx context.Context, query string, opts pr
 }
 
 func (s *AllAnimeService) GetEpisodeList(ctx context.Context, showID string) (*provider.EpisodeList, error) {
-	// TODO: implement
-	return nil, ErrNotImplemented
+	var queryStruct EpisodeListQuery
+	vars := EpisodeListVariables{
+		ShowID: graphql.String(showID),
+	}
+
+	err := s.client.Query(ctx, &queryStruct, vars.ToMap())
+	if err != nil {
+		log.Debug().AnErr("error", err).Str("showID", showID).Msg("Failed to get episode list.")
+		return nil, err
+	}
+
+	// Check if show exists (nil show returns empty ID)
+	if queryStruct.Show.ID == "" {
+		return nil, ErrShowNotFound
+	}
+
+	result := &provider.EpisodeList{
+		Sub: toStringSlice(queryStruct.Show.AvailableEpisodesDetail.Sub),
+		Dub: toStringSlice(queryStruct.Show.AvailableEpisodesDetail.Dub),
+		Raw: toStringSlice(queryStruct.Show.AvailableEpisodesDetail.Raw),
+	}
+
+	return result, nil
+}
+
+// toStringSlice converts graphql.String slice to string slice
+func toStringSlice(gs []graphql.String) []string {
+	result := make([]string, len(gs))
+	for i, v := range gs {
+		result[i] = string(v)
+	}
+	return result
 }
 
 func (s *AllAnimeService) GetEpisodeSources(ctx context.Context, showID string, translationType provider.TranslationType, episode string) (*provider.Episode, error) {

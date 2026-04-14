@@ -313,7 +313,6 @@ func TestGetEpisodeList(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Skip("GetEpisodeList not implemented yet")
 			server := mockServer(t, tt.serverResponse)
 			defer server.Close()
 
@@ -341,6 +340,44 @@ func TestGetEpisodeList(t *testing.T) {
 				t.Errorf("GetEpisodeList() Raw count = %d, want %d", len(result.Raw), tt.wantRaw)
 			}
 		})
+	}
+}
+
+func TestGetEpisodeList_GraphQLError(t *testing.T) {
+	serverResponse := map[string]any{
+		"errors": []map[string]any{
+			{
+				"message": "Invalid query",
+			},
+		},
+	}
+
+	server := mockServer(t, serverResponse)
+	defer server.Close()
+
+	svc := newTestService(server.URL, testConfig())
+	_, err := svc.GetEpisodeList(context.Background(), "invalid-id")
+
+	if err == nil {
+		t.Error("GetEpisodeList() expected error for GraphQL error response, got nil")
+	}
+}
+
+func TestGetEpisodeList_ShowNotFound(t *testing.T) {
+	serverResponse := map[string]any{
+		"data": map[string]any{
+			"show": nil,
+		},
+	}
+
+	server := mockServer(t, serverResponse)
+	defer server.Close()
+
+	svc := newTestService(server.URL, testConfig())
+	_, err := svc.GetEpisodeList(context.Background(), "nonexistent-id")
+
+	if err == nil {
+		t.Error("GetEpisodeList() expected error for nil show, got nil")
 	}
 }
 
